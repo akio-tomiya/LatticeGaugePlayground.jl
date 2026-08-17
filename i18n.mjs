@@ -1,5 +1,3 @@
-const STORAGE_KEY = 'gaugefields-lite-language';
-
 export const SUPPORTED_LANGUAGES = Object.freeze(['en', 'ja', 'zh-Hans']);
 
 const translations = {
@@ -583,16 +581,9 @@ export function languageFromSearch(search = '') {
   return null;
 }
 
-export function preferredLanguage(storedLanguage, browserLanguages = [], urlLanguage = null) {
+export function preferredLanguage(urlLanguage = null) {
   const recognizedUrlLanguage = recognizedLanguage(urlLanguage);
   if (recognizedUrlLanguage !== null) return recognizedUrlLanguage;
-  if (SUPPORTED_LANGUAGES.includes(storedLanguage)) return storedLanguage;
-  for (const language of browserLanguages) {
-    const normalized = normalizeLanguage(language);
-    if (normalized !== 'en' || String(language).toLowerCase().startsWith('en')) {
-      return normalized;
-    }
-  }
   return 'en';
 }
 
@@ -649,31 +640,16 @@ export function translateDocument(root = globalThis.document) {
   if (root.title !== undefined) root.title = t('app.title');
 }
 
-export function setLanguage(language, { persist = true, root = globalThis.document } = {}) {
+export function setLanguage(language, { root = globalThis.document } = {}) {
   currentLanguage = normalizeLanguage(language);
-  if (persist) {
-    try {
-      globalThis.localStorage?.setItem(STORAGE_KEY, currentLanguage);
-    } catch {
-      // The interface still switches when storage is unavailable or blocked.
-    }
-  }
   translateDocument(root);
   return currentLanguage;
 }
 
 export function initializeI18n(root = globalThis.document) {
-  let storedLanguage = null;
-  try {
-    storedLanguage = globalThis.localStorage?.getItem(STORAGE_KEY) ?? null;
-  } catch {
-    // Use the browser preference when storage is unavailable or blocked.
-  }
-  const browserLanguages = globalThis.navigator?.languages
-    ?? (globalThis.navigator?.language ? [globalThis.navigator.language] : []);
   const urlLanguage = languageFromSearch(globalThis.location?.search ?? '');
   return setLanguage(
-    preferredLanguage(storedLanguage, browserLanguages, urlLanguage),
-    { persist: false, root },
+    preferredLanguage(urlLanguage),
+    { root },
   );
 }
