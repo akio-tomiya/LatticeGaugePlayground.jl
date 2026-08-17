@@ -17,7 +17,7 @@ import {
   setLanguage,
   t,
   updateLanguageInUrl,
-} from './i18n.mjs?v=i18n-5';
+} from './i18n.mjs?v=i18n-6';
 
 initializeI18n();
 
