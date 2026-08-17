@@ -1,0 +1,18 @@
+{
+  "name": "Lattice Gauge Theory Playground",
+  "short_name": "Gauge Theory Lab",
+  "description": "Explore small-lattice SU(2) and SU(3) gauge theory in your browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111116",
+  "theme_color": "#111116",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+LatticeGaugePlayground.jl — third-party notices
+================================================
+
+This static application includes or adapts components from the following
+projects. The source revisions are pinned so that the notices match the code
+used by this distribution.
+
+Gaugefields.jl
+--------------
+Source: https://github.com/akio-tomiya/Gaugefields.jl
+Release: v1.0.1
+Revision: 5b61dfc854b3decacf1decb2bcc6286fc259fdbc
+License: MIT
+Full text: ./licenses/Gaugefields.jl-LICENSE.txt
+
+The GaugefieldsLite computation core contains byte-exact generated copies of
+Gaugefields.jl's two dependency-light portable heatbath source files and
+adapted browser specializations. It does not vendor or load the full
+Gaugefields.jl package in the browser. Source paths and blob hashes are
+recorded in the private source repository's upstream_manifest.toml.
+
+SubsetJulia WebAssembly runtime (julia-vm-oss)
+-----------------------------------------------
+Source: https://github.com/AtelierArith/julia-vm-oss
+Revision: 4fde7027e533214e9e97c0799b523bc6ee7d1396
+Package: subset_julia_vm_web 0.11.1
+Package license declaration: MIT OR Apache-2.0
+Distribution license used here: Apache-2.0
+Full text: ./licenses/julia-vm-oss-LICENSE.txt
+Dependency notices: ./licenses/julia-vm-oss-third-party/
+
+The vendored JavaScript, WebAssembly and TypeScript declaration were rebuilt
+from that revision with the local patch recorded in ../../runtime_pin.json.
+The separate deployment/demo repository at
+https://github.com/terasakisatoshi/subset_julia is a compatibility reference;
+the vendored runtime source and license are pinned to julia-vm-oss above.

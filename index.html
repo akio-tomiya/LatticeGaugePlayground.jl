@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111116">
+  <meta name="description" content="Explore lattice gauge theory in your browser."
+        data-i18n-content="meta.description">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://akio-tomiya.github.io/LatticeGaugePlayground.jl/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lattice Gauge Theory Playground">
+  <meta property="og:description" content="Explore lattice gauge theory in your browser.">
+  <meta property="og:url" content="https://akio-tomiya.github.io/LatticeGaugePlayground.jl/">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>Lattice Gauge Theory Playground</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css?v=i18n-2">
+</head>
+<body data-state="booting">
+  <a class="skip-link" href="#main-content" data-i18n="nav.skip">Skip to simulation controls</a>
+
+  <header class="site-header">
+    <div class="brand-block">
+      <p class="eyebrow" data-i18n="header.lab">Gauge theory lab</p>
+      <h1 data-i18n="app.title">Lattice Gauge Theory Playground</h1>
+      <p class="tagline" data-i18n="header.tagline">Lattice gauge theory in your browser.</p>
+      <p class="technology-note">
+        <span data-i18n="header.builtWith">Built with</span>
+        <a href="https://github.com/terasakisatoshi/subset_julia"
+           target="_blank" rel="noopener noreferrer">SubsetJulia/WASM</a>
+        <span data-i18n="header.componentsFrom">and gauge-field components adapted from</span>
+        <a href="https://github.com/JuliaQCD"
+           target="_blank" rel="noopener noreferrer">JuliaQCD</a>
+        <span data-i18n="header.possessive" aria-hidden="true">’s</span>
+        <a href="https://github.com/akio-tomiya/Gaugefields.jl"
+           target="_blank" rel="noopener noreferrer">Gaugefields.jl</a>.
+      </p>
+    </div>
+    <div class="header-actions">
+      <label class="language-control">
+        <span data-i18n="language.label">Language</span>
+        <select id="language-selector" aria-label="Language" data-i18n-aria-label="language.label">
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="zh-Hans">中文</option>
+        </select>
+      </label>
+      <div class="status-pill" role="status" aria-live="polite" aria-atomic="true">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>
+          <strong id="status-text">Loading calculator…</strong>
+          <small id="status-detail">Review the settings while it gets ready. The first visit may take longer.</small>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="workspace">
+    <section class="panel settings-panel" aria-labelledby="settings-title">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">01</p>
+          <h2 id="settings-title" data-i18n="settings.title">Simulation settings</h2>
+        </div>
+        <span id="gauge-tag" class="tag">SU(2)</span>
+      </div>
+
+      <form id="simulation-form" novalidate>
+        <div class="field-grid two-column">
+          <label>
+            <span data-i18n="settings.gaugeGroup">Gauge group</span>
+            <select id="gauge-group" aria-label="Gauge group" data-i18n-aria-label="settings.gaugeGroup">
+              <option value="SU2" selected>SU(2)</option>
+              <option value="SU3">SU(3)</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="settings.action">Action</span>
+            <select disabled aria-label="Gauge action" data-i18n-aria-label="settings.action">
+              <option>Wilson</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          <span data-i18n="settings.latticeSize">Lattice size</span>
+          <select id="lattice-size" required>
+            <option value="1,1,1,1" data-i18n="settings.lattice1">1⁴</option>
+            <option value="2,2,2,2" data-i18n="settings.lattice2">2⁴</option>
+            <option value="4,4,4,2" data-i18n="settings.lattice4442">4 × 4 × 4 × 2</option>
+            <option value="4,4,4,4" selected data-i18n="settings.lattice4">4⁴</option>
+          </select>
+        </label>
+
+        <div class="field-grid two-column">
+          <label>
+            <span>β</span>
+            <input id="beta" type="number" value="2.3" min="0" max="20" step="0.1" required>
+          </label>
+          <label>
+            <span data-i18n="settings.initialConfiguration">Initial configuration</span>
+            <select id="condition" required>
+              <option value="cold" selected data-i18n="settings.cold">Cold</option>
+              <option value="hot" data-i18n="settings.random">Random</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          <span data-i18n="settings.algorithm">Algorithm</span>
+          <select id="algorithm" aria-label="Update algorithm" data-i18n-aria-label="settings.algorithm">
+            <option value="heatbath" selected data-i18n="settings.heatbath">Heatbath</option>
+            <option value="metropolis" data-i18n="settings.metropolis">Metropolis</option>
+          </select>
+        </label>
+        <p id="algorithm-compatibility" class="compatibility-note" role="status" hidden></p>
+
+        <div class="field-grid two-column">
+          <label>
+            <span data-i18n="settings.sweeps">Sweeps</span>
+            <input id="sweeps" type="number" value="200" min="0" max="1000" step="1" required>
+          </label>
+          <label>
+            <span data-i18n="settings.seed">Seed</span>
+            <input id="seed" type="number" value="123" min="0" max="9007199254740991" step="1" required>
+          </label>
+        </div>
+        <p class="field-note" data-i18n="settings.sweepNote">Each completed sweep updates the lattice view.</p>
+
+        <details class="advanced-settings">
+          <summary data-i18n="settings.advanced">Advanced settings</summary>
+          <label id="epsilon-field">
+            <span data-i18n="settings.proposalStrength">Proposal strength ε</span>
+            <input id="epsilon" type="number" value="0.2" min="0.01" max="1" step="0.01" required>
+          </label>
+        </details>
+
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+        <p id="action-guidance" class="action-guidance" role="status">
+          <span data-i18n="guidance.loading">You can change the settings while the calculator loads.</span>
+        </p>
+        <div class="action-row">
+          <button id="run-button" class="button primary" type="submit" disabled>
+            Run 200 sweeps
+          </button>
+          <button id="view-plane-button" class="button secondary" type="button" disabled hidden>
+            <span data-i18n="action.showPlane">Show selected plane</span>
+          </button>
+          <button id="continue-button" class="button primary" type="button" disabled hidden>
+            <span data-i18n="action.continue">Continue</span>
+          </button>
+          <button id="reset-button" class="button destructive" type="button" disabled hidden
+                  aria-label="Start over and discard the saved simulation"
+                  data-i18n-aria-label="action.startOverAria">
+            <span data-i18n="action.startOver">Start over</span>
+          </button>
+          <button id="cancel-button" class="button secondary" type="button" disabled hidden>
+            <span data-i18n="action.cancel">Cancel</span>
+          </button>
+        </div>
+      </form>
+
+      <div id="calculation-error" class="error-card" role="alert" hidden>
+        <strong data-i18n="error.calculationTitle">The calculation could not be completed.</strong>
+        <p data-i18n="error.calculationHint">Try a smaller lattice or fewer sweeps.</p>
+        <button id="retry-button" class="text-button" type="button" data-i18n="action.retry">Prepare again</button>
+      </div>
+    </section>
+
+    <section class="panel lattice-panel" aria-labelledby="lattice-title">
+      <div class="panel-heading visualization-heading">
+        <div>
+          <p class="section-kicker">02</p>
+          <h2 id="lattice-title" data-i18n="visualization.title">Gauge-field activity</h2>
+          <p class="visualization-subtitle" data-i18n="visualization.subtitle">Local plaquette action density on one slice</p>
+        </div>
+        <output id="elapsed-time" class="elapsed-time"
+                aria-label="Calculator preparation time"
+                data-i18n-aria-label="elapsed.preparingAria">Loading 0.0 s</output>
+      </div>
+
+      <div class="view-controls">
+        <label>
+          <span data-i18n="visualization.view">View</span>
+          <select id="visualization-mode">
+            <option value="landscape" selected data-i18n="visualization.landscape">Landscape</option>
+            <option value="heatmap" data-i18n="visualization.heatmap">Heatmap</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="visualization.plane">Plane</span>
+          <select id="plane">
+            <option value="xy" selected>xy</option>
+            <option value="xz">xz</option>
+            <option value="xt">xt</option>
+            <option value="yz">yz</option>
+            <option value="yt">yt</option>
+            <option value="zt">zt</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="visualization.slice">Slice</span>
+          <input id="slice" type="number" value="1" min="1" max="1" step="1">
+        </label>
+        <div class="playback-control">
+          <span data-i18n="visualization.evolution">Evolution</span>
+          <button id="replay-button" class="replay-button" type="button" disabled
+                  data-i18n="visualization.replay">Replay</button>
+          <output id="frame-indicator">Loading calculator…</output>
+          <input id="replay-slider" class="replay-slider" type="range"
+                 min="0" max="0" value="0" step="1" disabled
+                 aria-label="Select a received Monte Carlo sweep"
+                 data-i18n-aria-label="visualization.sliderAria">
+        </div>
+      </div>
+
+      <div id="activity-frame" class="canvas-frame heatmap-frame" data-view="landscape">
+        <canvas id="heatmap" aria-label="Gauge-field activity landscape"
+                data-i18n-aria-label="visualization.landscapeAria"
+                aria-describedby="heatmap-summary">
+          <span data-i18n="visualization.canvasFallback">Gauge-field activity visualization.</span>
+        </canvas>
+        <div id="activity-waiting" class="activity-waiting" aria-hidden="true">
+          <span class="activity-waiting-signal">
+            <i></i><i></i><i></i>
+          </span>
+          <strong id="activity-waiting-title">Loading calculator…</strong>
+          <small id="activity-waiting-detail">Review the settings while it gets ready.</small>
+        </div>
+        <div id="guided-welcome" class="guided-welcome" hidden>
+          <span class="guided-step" data-i18n="guided.welcomeStep">Guided experiment · about one minute</span>
+          <strong data-i18n="guided.welcomeTitle">Watch order become fluctuations</strong>
+          <p data-i18n="guided.welcomeDetail">Start from an ordered SU(2) field, then watch Monte Carlo sampling build a fluctuating configuration.</p>
+          <button id="guided-start-button" class="guided-start-button" type="button" disabled>
+            <span data-i18n="guided.start">Start guided experiment</span>
+          </button>
+          <small data-i18n="guided.priorKnowledge">No prior knowledge is needed. You can still use the Lab settings at any time.</small>
+        </div>
+        <aside id="guided-callout" class="guided-callout" aria-live="polite" hidden>
+          <span id="guided-step" class="guided-step" data-i18n="guided.predictStep">01 · Predict</span>
+          <strong id="guided-title" data-i18n="guided.predictTitle">What will happen to an ordered field?</strong>
+          <p id="guided-detail" data-i18n="guided.predictDetail">The bars show local plaquette action density, not objects standing in physical space.</p>
+        </aside>
+      </div>
+      <p id="heatmap-summary" class="canvas-caption">
+        Loading calculator… Each bar will represent one site on the selected lattice slice.
+      </p>
+    </section>
+
+    <aside class="observables-column" aria-labelledby="observables-title">
+      <div class="panel-heading observables-heading">
+        <div>
+          <p class="section-kicker">03</p>
+          <h2 id="observables-title" data-i18n="observables.title">Observables</h2>
+        </div>
+      </div>
+
+      <section class="metric-card accent-violet">
+        <span data-i18n="observables.averagePlaquette">Average plaquette</span>
+        <strong id="plaquette-value">—</strong>
+        <small data-i18n="observables.normalizedPlaquette">Normalized Wilson plaquette</small>
+      </section>
+      <section class="metric-card accent-purple">
+        <span data-i18n="observables.polyakov">Polyakov loop |L|</span>
+        <strong id="polyakov-value">—</strong>
+        <small data-i18n="observables.polyakovDetail">Magnitude of the spatial average</small>
+      </section>
+      <section class="metric-card accent-green">
+        <span id="update-rate-label">Links updated</span>
+        <strong id="acceptance-value">—</strong>
+        <small id="acceptance-detail">No heatbath updates yet</small>
+      </section>
+
+      <section class="chart-card">
+        <div class="chart-heading">
+          <h3 data-i18n="observables.history">Plaquette history</h3>
+          <span id="history-count">0 sweeps</span>
+        </div>
+        <div class="canvas-frame chart-frame">
+          <canvas id="history-chart" aria-label="Plaquette history by sweep"
+                  data-i18n-aria-label="observables.historyAria">
+            <span data-i18n="observables.historyFallback">Plaquette history by sweep.</span>
+          </canvas>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <span data-i18n="footer.local">Calculations run locally in your browser.</span>
+    <span><a href="./THIRD_PARTY_NOTICES.txt" data-i18n="footer.licenses">Third-party licenses</a></span>
+  </footer>
+
+    <script type="module" src="./app.js?v=i18n-5"></script>
+</body>
+</html>

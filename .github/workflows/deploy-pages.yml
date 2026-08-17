@@ -1,0 +1,53 @@
+name: Deploy latest playground to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out deployment repository
+        uses: actions/checkout@v6
+      - name: Validate published files
+        run: |
+          test -f index.html
+          test -f app.js
+          test -f gaugefields-lite-su2.repl.jl
+          test -f gaugefields-lite-su3.repl.jl
+          test -f vendor/subset_julia/subset_julia_vm_web_bg.wasm
+          test -f BUILD_INFO.json
+          test -f LICENSE
+          test -f LICENSE.txt
+          test -f THIRD_PARTY_NOTICES.txt
+          cmp LICENSE LICENSE.txt
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+          include-hidden-files: true
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
