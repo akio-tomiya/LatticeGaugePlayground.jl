@@ -5,9 +5,9 @@
   "live_url": "https://akio-tomiya.github.io/LatticeGaugePlayground.jl/",
   "deployment_repository": "akio-tomiya/LatticeGaugePlayground.jl",
   "source_repository": "akio-tomiya/LatticeGaugePlayground.dev",
-  "source_commit": "76c70f65c27b83b8a5901f74d0ce5aa8a1dae755",
-  "source_commit_short": "76c70f65c27b",
-  "generated_at_utc": "2026-08-17T22:59:40.458Z",
+  "source_commit": "3f748ddb6e39db2001aabb7f473235b7b0cc04fe",
+  "source_commit_short": "3f748ddb6e39",
+  "generated_at_utc": "2026-08-17T23:09:21.463Z",
   "validation": [
     "make check",
     "byte-exact app copy",
