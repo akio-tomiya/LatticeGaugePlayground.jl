@@ -2,11 +2,12 @@ import {
   DEFAULT_BETA_BY_GAUGE_GROUP,
   heatbathSupportsLattice,
   heatmapColorRange,
+  landscapePlaneBasis,
   WebContractError,
   decodeWebResult,
   planeSliceMaximum,
   validateSimulationParameters,
-} from './result-contract.mjs?v=runtime-v20';
+} from './result-contract.mjs?v=runtime-v21';
 import {
   GUIDED_EXPERIMENT,
   guidedNarration,
@@ -1042,6 +1043,7 @@ function drawActivityLandscape(result, parameters, frameIndex) {
   const { minimum, maximum } = heatmapColorRange(parameters.gaugeGroup);
   const columns = result.sliceWidth;
   const rows = result.sliceHeight;
+  const basis = landscapePlaneBasis(parameters.plane);
   const legendSpace = 58;
   const gridSpan = Math.max(2, columns + rows);
   const topY = Math.max(72, height * 0.29);
@@ -1052,41 +1054,45 @@ function drawActivityLandscape(result, parameters, frameIndex) {
   const verticalStep = horizontalStep * 0.46;
   const centerX = (width - legendSpace) * 0.52;
   const point = (column, row) => ({
-    x: centerX + (column - row) * horizontalStep,
-    y: topY + (column + row) * verticalStep,
+    x: centerX + (
+      column * basis.firstDirection.x + row * basis.secondDirection.x
+    ) * horizontalStep,
+    y: topY + (
+      column * basis.firstDirection.y + row * basis.secondDirection.y
+    ) * horizontalStep,
   });
 
   const top = point(0, 0);
-  const right = point(columns, 0);
-  const bottom = point(columns, rows);
-  const left = point(0, rows);
+  const firstEnd = point(columns, 0);
+  const front = point(columns, rows);
+  const secondEnd = point(0, rows);
   const slabDepth = Math.max(5, verticalStep * 0.3);
 
   context.beginPath();
-  context.moveTo(left.x, left.y);
-  context.lineTo(bottom.x, bottom.y);
-  context.lineTo(bottom.x, bottom.y + slabDepth);
-  context.lineTo(left.x, left.y + slabDepth);
+  context.moveTo(firstEnd.x, firstEnd.y);
+  context.lineTo(front.x, front.y);
+  context.lineTo(front.x, front.y + slabDepth);
+  context.lineTo(firstEnd.x, firstEnd.y + slabDepth);
   context.closePath();
   context.fillStyle = 'rgba(66, 49, 113, 0.34)';
   context.fill();
 
   context.beginPath();
-  context.moveTo(right.x, right.y);
-  context.lineTo(bottom.x, bottom.y);
-  context.lineTo(bottom.x, bottom.y + slabDepth);
-  context.lineTo(right.x, right.y + slabDepth);
+  context.moveTo(secondEnd.x, secondEnd.y);
+  context.lineTo(front.x, front.y);
+  context.lineTo(front.x, front.y + slabDepth);
+  context.lineTo(secondEnd.x, secondEnd.y + slabDepth);
   context.closePath();
   context.fillStyle = 'rgba(34, 28, 66, 0.62)';
   context.fill();
 
   context.beginPath();
   context.moveTo(top.x, top.y);
-  context.lineTo(right.x, right.y);
-  context.lineTo(bottom.x, bottom.y);
-  context.lineTo(left.x, left.y);
+  context.lineTo(firstEnd.x, firstEnd.y);
+  context.lineTo(front.x, front.y);
+  context.lineTo(secondEnd.x, secondEnd.y);
   context.closePath();
-  const floor = context.createLinearGradient(top.x, top.y, bottom.x, bottom.y);
+  const floor = context.createLinearGradient(top.x, top.y, front.x, front.y);
   floor.addColorStop(0, 'rgba(37, 29, 69, 0.92)');
   floor.addColorStop(1, 'rgba(12, 11, 28, 0.96)');
   context.fillStyle = floor;
@@ -1131,18 +1137,16 @@ function drawActivityLandscape(result, parameters, frameIndex) {
     const inset = 0.2;
     const baseCorners = [
       point(site.column + inset, site.row + inset),
-      point(site.column + 1 - inset, site.row + inset),
-      point(site.column + 1 - inset, site.row + 1 - inset),
       point(site.column + inset, site.row + 1 - inset),
+      point(site.column + 1 - inset, site.row + 1 - inset),
+      point(site.column + 1 - inset, site.row + inset),
     ];
     const lift = Math.max(2, visibleActivity * Math.min(72, horizontalStep * 1.55));
     drawLandscapeBuilding(context, baseCorners, lift, colorPosition);
   }
 
-  const firstAxis = parameters.plane[0];
-  const secondAxis = parameters.plane[1];
-  drawLandscapeAxis(context, top, right, firstAxis);
-  drawLandscapeAxis(context, top, left, secondAxis);
+  drawLandscapeAxis(context, top, firstEnd, basis.firstAxis);
+  drawLandscapeAxis(context, top, secondEnd, basis.secondAxis);
 
   const legendX = width - 43;
   const legendTop = Math.max(72, height * 0.2);

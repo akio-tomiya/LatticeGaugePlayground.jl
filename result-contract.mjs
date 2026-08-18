@@ -21,6 +21,23 @@ export function heatmapColorRange(gaugeGroup) {
   return range;
 }
 
+const LANDSCAPE_FIRST_DIRECTION = Object.freeze({ x: -1, y: 0.46 });
+const LANDSCAPE_SECOND_DIRECTION = Object.freeze({ x: 1, y: 0.46 });
+const LANDSCAPE_ACTIVITY_DIRECTION = Object.freeze({ x: 0, y: -1 });
+
+export function landscapePlaneBasis(plane) {
+  if (!VALID_PLANES.has(plane)) {
+    throw new WebContractError('unsupported plane for landscape');
+  }
+  return Object.freeze({
+    firstAxis: plane[0],
+    secondAxis: plane[1],
+    firstDirection: LANDSCAPE_FIRST_DIRECTION,
+    secondDirection: LANDSCAPE_SECOND_DIRECTION,
+    activityDirection: LANDSCAPE_ACTIVITY_DIRECTION,
+  });
+}
+
 export function heatbathSupportsLattice(latticeExtents) {
   return Array.isArray(latticeExtents)
     && latticeExtents.length === 4

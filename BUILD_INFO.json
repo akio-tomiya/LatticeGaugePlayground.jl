@@ -5,9 +5,9 @@
   "live_url": "https://akio-tomiya.github.io/LatticeGaugePlayground.jl/",
   "deployment_repository": "akio-tomiya/LatticeGaugePlayground.jl",
   "source_repository": "akio-tomiya/LatticeGaugePlayground.dev",
-  "source_commit": "35f20f6877a581381356a5293cac8c7b81dcc423",
-  "source_commit_short": "35f20f6877a5",
-  "generated_at_utc": "2026-08-17T23:38:41.612Z",
+  "source_commit": "c487a55f12d6c6363bd8e5e93ccfd40ba0dad605",
+  "source_commit_short": "c487a55f12d6",
+  "generated_at_utc": "2026-08-18T00:16:18.212Z",
   "validation": [
     "make check",
     "byte-exact app copy",
@@ -15,7 +15,7 @@
   ],
   "application": {
     "file_count": 142,
-    "bytes": 25775974
+    "bytes": 25776757
   },
   "upstream": {
     "gaugefields": {
